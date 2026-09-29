@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SyntaxFlow | Learn LeetCode Through Syntax & Visual Memory</title>
+  <meta name="description" content="Minimalist platform to write Python syntax with real-time memory and logic animations for LeetCode problems.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Navigation Bar (Minimalist) -->
+    <header class="top-nav">
+      <div class="nav-left">
+        <div class="logo">
+          <span class="logo-icon">{ }</span>
+          <span class="logo-text">Syntax<span>Flow</span></span>
+        </div>
+        <div class="problem-selector-wrapper">
+          <label for="problem-select" class="sr-only">Select Problem</label>
+          <select id="problem-select" class="problem-dropdown">
+            <option value="reverse-brackets" selected>#1190 · Reverse Substring in Brackets</option>
+            <option value="add-new" disabled>+ Add Problem (Config Ready)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="nav-center">
+        <!-- Minimal quick phase indicators -->
+        <div class="phase-capsules">
+          <button class="phase-pill active" id="btn-phase-1" data-phase="1">
+            <span class="phase-dot"></span> Phase 1: Bracket Stack
+          </button>
+          <button class="phase-pill" id="btn-phase-2" data-phase="2">
+            <span class="phase-dot"></span> Phase 2: Wormhole Traversal
+          </button>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <!-- Interactive Mode Toggle: Step Walkthrough vs Interactive Code Writer -->
+        <div class="mode-switch">
+          <button class="mode-btn active" id="mode-walkthrough" title="Step-by-step guided animation">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Walkthrough</span>
+          </button>
+          <button class="mode-btn" id="mode-typewriter" title="Type syntax and watch it animate live">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+            <span>Write Syntax</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Split: Code Workspace on Left, Visual Engine on Right -->
+    <main class="workspace">
+      
+      <!-- LEFT PANE: Coding Space -->
+      <section class="code-pane">
+        <div class="pane-header">
+          <div class="tab-group">
+            <button class="tab-btn active" id="tab-solution">solution.py</button>
+            <span class="badge python-badge">Python 3</span>
+          </div>
+
+          <div class="input-config">
+            <span class="input-label">s =</span>
+            <input type="text" id="test-string-input" value="back(aps)ce" spellcheck="false" title="Click to test another string">
+            <button id="btn-apply-input" class="btn-icon" title="Reset & Run with this input">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            </button>
+          </div>
+
+          <div class="presets-selector">
+            <span class="presets-label">Tests:</span>
+            <button class="preset-tag active-preset" data-str="back(aps)ce">back(aps)ce</button>
+            <button class="preset-tag" data-str="(abcd)">(abcd)</button>
+            <button class="preset-tag" data-str="(u(love)i)">(u(love)i)</button>
+            <button class="preset-tag" data-str="(ed(et(oc))el)">(ed(et(oc))el)</button>
+          </div>
+        </div>
+
+        <!-- Mode A: Walkthrough & Clickable Lines Code Area -->
+        <div class="editor-container" id="editor-walkthrough-view">
+          <div class="line-numbers" id="line-numbers"></div>
+          <div class="code-content" id="code-content">
+            <!-- Dynamic code lines with syntax tokens will be injected here -->
+          </div>
+        </div>
+
+        <!-- Mode B: Interactive Write Syntax Space -->
+        <div class="interactive-writer-container" id="editor-writer-view" style="display: none;">
+          <div class="writer-prompt-banner">
+            <span class="prompt-icon">💡</span>
+            <div class="prompt-text">
+              <strong id="writer-target-title">Type:</strong>
+              <code id="writer-target-snippet">stack = []</code>
+              <p id="writer-target-desc">Type this syntax below to see how Python reserves memory for an empty list container.</p>
+            </div>
+            <button class="btn-micro" id="btn-quick-fill" title="Auto-fill this line">Auto-fill ⚡</button>
+          </div>
+
+          <div class="writer-editor-wrapper">
+            <div class="writer-gutter">1</div>
+            <div class="writer-input-box">
+              <textarea id="syntax-type-input" placeholder="Type python syntax here (e.g. stack = [], for i, char in enumerate(s): ...)" spellcheck="false"></textarea>
+            </div>
+          </div>
+
+          <div class="quick-syntax-chips">
+            <span class="chips-label">Quick try:</span>
+            <button class="chip" data-code="stack = []">stack = []</button>
+            <button class="chip" data-code="for i, char in enumerate(s):">for i, char in enumerate(s):</button>
+            <button class="chip" data-code="if char == &quot;(&quot;:">if char == "(": stack.append(i)</button>
+            <button class="chip" data-code="elif char == &quot;)&quot;:">elif char == ")": stack.pop()</button>
+            <button class="chip" data-code="close[')'][i] = opening_pos">close[')'][i] = opening_pos</button>
+            <button class="chip" data-code="traverse(1, 0)">traverse(direction, start)</button>
+          </div>
+        </div>
+
+        <!-- Code Execution Bottom Toolbar -->
+        <div class="editor-footer">
+          <div class="playback-controls">
+            <button id="btn-reset" class="btn-control" title="Restart animation">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            </button>
+            <button id="btn-prev" class="btn-control" title="Previous step (Left Arrow)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+            </button>
+            <button id="btn-play" class="btn-control btn-primary-play" title="Play / Pause (Spacebar)">
+              <svg id="play-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <svg id="pause-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            </button>
+            <button id="btn-next" class="btn-control" title="Next step (Right Arrow)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+            </button>
+          </div>
+
+          <div class="step-progress-wrapper">
+            <div class="step-text">
+              <span id="step-current">Step 0</span> / <span id="step-total">0</span>
+            </div>
+            <div class="progress-bar-bg" id="progress-container">
+              <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+          </div>
+
+          <div class="speed-control">
+            <label for="speed-select">Speed:</label>
+            <select id="speed-select">
+              <option value="1800">0.5x</option>
+              <option value="1000" selected>1.0x</option>
+              <option value="500">2.0x</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT PANE: Visual Syntax & Memory Engine -->
+      <section class="visual-pane">
+        
+        <!-- Context Banner: What does this exact line of syntax do? -->
+        <div class="syntax-insight-card">
+          <div class="insight-header">
+            <div class="insight-badge" id="insight-category">SYNTAX MECHANIC</div>
+            <div class="current-line-syntax" id="insight-syntax-pill">stack = []</div>
+          </div>
+          <div class="insight-body">
+            <h3 id="insight-title">Initializing Memory Structure</h3>
+            <p id="insight-explanation">Creates a dynamic array container in heap memory with zero elements ready for O(1) append and pop operations.</p>
+          </div>
+        </div>
+
+        <!-- Visual Canvas Components -->
+        <div class="visual-canvas">
+          
+          <!-- Component 1: Input String & Enumerate Iterator Visualizer -->
+          <div class="canvas-module" id="module-string-iter">
+            <div class="module-header">
+              <div class="module-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+                <span>String & <code>enumerate(s)</code> Iterator</span>
+              </div>
+              <div class="module-tags" id="iter-tags">
+                <span class="iter-var-tag">i = <b id="iter-val-i">-</b></span>
+                <span class="iter-var-tag">char = <b id="iter-val-char">-</b></span>
+                <span class="iter-var-tag dir-tag" id="iter-val-dir" style="display:none;">dir: <b id="dir-arrow">→ (+1)</b></span>
+              </div>
+            </div>
+
+            <div class="string-strip-wrapper">
+              <div class="string-track" id="string-track">
+                <!-- String character cells will be rendered here -->
+              </div>
+            </div>
+
+            <!-- Wormhole Portal Arcs Canvas Overlay -->
+            <svg class="portal-svg-overlay" id="portal-svg"></svg>
+          </div>
+
+          <!-- Component 2: Dual Grid - Stack Visualizer & Bracket Portal Map -->
+          <div class="canvas-grid-dual">
+            
+            <!-- SUB-PANEL A: Stack Visualizer (stack = []) -->
+            <div class="canvas-module stack-module">
+              <div class="module-header">
+                <div class="module-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                  <span>Stack Memory <code>stack = []</code></span>
+                </div>
+                <span class="stack-len-badge">len: <span id="stack-count">0</span></span>
+              </div>
+
+              <div class="stack-vessel-container">
+                <div class="stack-vessel" id="stack-vessel">
+                  <div class="stack-empty-state" id="stack-empty-label">
+                    <span class="empty-icon">[ ]</span>
+                    <span>Empty List Allocated</span>
+                  </div>
+                  <!-- Stack items will slide down here -->
+                </div>
+                <div class="stack-base-plate"></div>
+              </div>
+              
+              <div class="stack-legend">
+                <span>Top of Stack (LIFO: Last-In First-Out)</span>
+              </div>
+            </div>
+
+            <!-- SUB-PANEL B: Bracket Wormholes Map (close dict) -->
+            <div class="canvas-module portals-module">
+              <div class="module-header">
+                <div class="module-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                  <span>Bracket Portals <code>close[')'][i]</code></span>
+                </div>
+                <span class="pairs-count" id="pairs-count">0 pairs</span>
+              </div>
+
+              <div class="portals-content" id="portals-content">
+                <div class="portal-empty-hint" id="portal-empty-hint">
+                  No matching pairs mapped yet. When a <code>')'</code> is encountered, it pairs with popped <code>'('</code> index.
+                </div>
+                <div class="portal-pairs-list" id="portal-pairs-list"></div>
+              </div>
+
+              <div class="teleport-status" id="teleport-status" style="display: none;">
+                <span class="pulse-indicator"></span>
+                <span id="teleport-text">Wormhole jump active</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Component 3: Phase 2 Result Stream Buffer (result = []) -->
+          <div class="canvas-module result-module">
+            <div class="module-header">
+              <div class="module-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Result Buffer <code>result = []</code></span>
+              </div>
+              <div class="result-string-preview">
+                Final: "<span id="result-final-text"></span>"
+              </div>
+            </div>
+
+            <div class="result-stream-container">
+              <div class="result-cells" id="result-cells">
+                <!-- Appended characters live -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/problems.js"></script>
+  <script src="js/visualizer.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
